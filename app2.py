@@ -8,11 +8,14 @@ import os
 
 def append_prediction_to_excel(df: pd.DataFrame, filename: str = "COVID_Predictions.xlsx"):
     """Append a prediction row to the Excel file, creating it if necessary."""
-    if os.path.exists(filename):
-        existing_df = pd.read_excel(filename)
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(app_dir, "COVID_Predictions.xlsx")
+
+    if os.path.exists(file_path):
+        existing_df = pd.read_excel(file_path)
         df = pd.concat([existing_df, df], ignore_index=True)
 
-    df.to_excel(filename, index=False, engine="openpyxl")
+    df.to_excel(file_path, index=False, engine="openpyxl")
 
 
 # =========================
@@ -376,6 +379,8 @@ with right:
                 st.success(f"✅ Report saved to {excel_file}")
                 st.info(f"Patient: {patient_name} | Prediction: {risk_status}")
 
+            except PermissionError as e:
+                st.error(f"❌ Permission denied when saving Excel. Close the file if it is open and ensure the app has write access to the folder. ({str(e)})")
             except Exception as e:
                 st.error(f"❌ Error saving to Excel: {str(e)}")
 
